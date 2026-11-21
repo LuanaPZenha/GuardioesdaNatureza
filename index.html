@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guardiões da Natureza</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="screen">
+  <canvas id="game" width="960" height="540"></canvas>
+
+  <div id="title">
+    <div class="tag">Um planeta melhor começa com você!</div>
+    <div class="menu">
+      <p id="loadstate">Carregando o mundo...</p>
+      <button type="button" id="btn-play" class="primary" disabled>Jogar</button>
+      <button type="button" id="btn-how">Controles</button>
+      <button type="button" id="btn-credits">Créditos</button>
+      <button type="button" id="btn-new" class="hidden">Novo jogo</button>
+    </div>
+    <div class="ver">v1.0.0</div>
+  </div>
+
+  <div id="panel-how" class="panel hidden">
+    <div class="card">
+      <p class="kicker">Controles</p>
+      <h2>Como jogar</h2>
+      <ul class="help">
+        <li><b>A D</b> ou setas — andar</li>
+        <li><b>Espaço</b> ou <b>W</b> — pular</li>
+        <li><b>J</b> — ataque com o cajado</li>
+        <li><b>Shift</b> — Correnteza, o dash (depois do chefe das marés)</li>
+        <li><b>K</b> — Luz do Cristal (depois do Coração)</li>
+        <li><b>Baixo + J</b> no ar — Esporos (depois do pântano)</li>
+        <li><b>Q</b> — poção</li>
+        <li><b>E</b> — loja, portais e baús</li>
+        <li><b>Esc</b> — pausa</li>
+      </ul>
+      <p>Salto duplo e escalada nas paredes acontecem sozinhos quando você já os conquistou. Segure o pulo para ir mais alto.</p>
+      <button type="button" class="primary" data-close>Fechar</button>
+    </div>
+  </div>
+
+  <div id="panel-credits" class="panel hidden">
+    <div class="card">
+      <p class="kicker">Créditos</p>
+      <h2>Guardiões da Natureza</h2>
+      <p>Kai e Lumi atravessam florestas, marés, pântanos, montanhas e o coração do planeta para apagar o Vale Industrial.</p>
+      <p>Cada chefe entrega uma habilidade. A primeira região escolhida é a mais fácil. A próxima fica mais dura, até o vale final.</p>
+      <button type="button" class="primary" data-close>Fechar</button>
+    </div>
+  </div>
+
+  <div id="panel-intro" class="panel hidden">
+    <div class="card">
+      <p class="kicker">Lumi</p>
+      <h2>O santuário está ferido</h2>
+      <p>Escolha qualquer portal, menos o Vale Industrial. A primeira região entra no grau fácil. Cada chefe derrotado sobe o grau da próxima e cura um pedaço da base.</p>
+      <p>Na loja você troca cristais por vida, força, velocidade e poções. Segredos nas fases pedem as habilidades dos chefes. Dá para voltar depois.</p>
+      <button type="button" class="primary" id="intro-ok">Entendi</button>
+    </div>
+  </div>
+
+  <div id="panel-zone" class="panel hidden">
+    <div class="card">
+      <p class="kicker" id="zone-kicker">Região</p>
+      <h2 id="zone-name"></h2>
+      <p id="zone-tier"></p>
+      <p id="zone-enemies"></p>
+      <p id="zone-lock" class="warn"></p>
+      <div class="row">
+        <button type="button" class="primary" id="zone-go">Entrar</button>
+        <button type="button" id="zone-back">Voltar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-shop" class="panel hidden">
+    <div class="card wide">
+      <p class="kicker">Loja do santuário</p>
+      <h2>Troca de cristais</h2>
+      <p id="shop-wallet"></p>
+      <div id="shop-list"></div>
+      <button type="button" id="shop-close">Fechar</button>
+    </div>
+  </div>
+
+  <div id="panel-pause" class="panel hidden">
+    <div class="card">
+      <p class="kicker">Pausa</p>
+      <h2>Guardiões</h2>
+      <div class="col">
+        <button type="button" class="primary" id="pause-go">Continuar</button>
+        <button type="button" id="pause-how">Controles</button>
+        <button type="button" id="pause-hub">Santuário</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-dead" class="panel hidden">
+    <div class="card">
+      <p class="kicker">Kai caiu</p>
+      <h2>A natureza ainda precisa de você</h2>
+      <p>Os cristais que você já pegou continuam na bolsa. O chefe desta tentativa ainda está de pé.</p>
+      <div class="row">
+        <button type="button" class="primary" id="dead-retry">Tentar de novo</button>
+        <button type="button" id="dead-hub">Santuário</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-unlock" class="panel hidden">
+    <div class="card">
+      <p class="kicker" id="unlock-kicker">Vitória</p>
+      <h2 id="unlock-name"></h2>
+      <p id="unlock-desc"></p>
+      <p id="unlock-restore"></p>
+      <button type="button" class="primary" id="unlock-ok">Voltar ao santuário</button>
+    </div>
+  </div>
+
+  <div id="panel-ending" class="panel hidden">
+    <div class="card">
+      <p class="kicker">Final</p>
+      <h2>O planeta respira</h2>
+      <p>A Fornalha-Mãe apagou. O Vale Industrial ficou em silêncio e o santuário recuperou cada pedaço: floresta, marés, pântano, montanha e cristal.</p>
+      <p>Kai recebeu o Pulso do Planeta. Lumi volta a brilhar por inteiro.</p>
+      <button type="button" class="primary" id="ending-ok">Caminhar pelo santuário</button>
+    </div>
+  </div>
+</div>
+<script src="js/game.js"></script>
+</body>
+</html>
