@@ -13,7 +13,7 @@ const TIERS = [
 const TIER_FINAL = { id: 5, name: "Final", hp: 3.15, dmg: 2.2, spd: 1.2, reward: 3 };
 
 const ABILITIES = {
-  double: { name: "Raiz Ascendente", desc: "Segundo salto no ar. Alcança copas, saliências e o treino alto do santuário." },
+  double: { name: "Raiz Ascendente", desc: "O segundo pulo, no mesmo botão, sobe ainda mais alto e alcança as copas." },
   dash: { name: "Correnteza", desc: "Shift. Um impulso com um instante de invulnerabilidade. Cruza vãos que o pulo não alcança." },
   spores: { name: "Esporos", desc: "No ar, seta para baixo + J. Você despenca e solta uma nuvem. Quebra bulbos do pântano." },
   wall: { name: "Garra Glacial", desc: "Encoste numa parede no ar e pule de novo. Sirva-se dos poços verticais." },
@@ -190,6 +190,13 @@ function clearedCount() {
 }
 function has(id) { return !!(save && save.abilities[id]); }
 function maxHp() { return 100 + 22 * (save.hpRank || 0); }
+function healFraction(part) {
+  const before = player.hp;
+  const cap = maxHp();
+  player.hp = Math.min(cap, before + Math.round(cap * part));
+  if (player.hp > before) sfx("heal");
+  return player.hp - before;
+}
 function dmgMul() { return 1 + 0.22 * (save.dmgRank || 0); }
 function speedMul() { return 1 + 0.08 * (save.spdRank || 0); }
 
@@ -445,6 +452,7 @@ function buildLevel(zone) {
       plat(0, G, 460, 110, t),
       plat(560, G, 280, 110, t),
       plat(930, G - 70, 200, 90, t),
+      plat(1160, G - 70, 110, 70, t),
       plat(1310, G - 70, 150, 70, t),
       plat(1540, G, 420, 110, t),
       plat(2060, G - 50, 240, 80, t),
@@ -462,9 +470,11 @@ function buildLevel(zone) {
     L.platforms = [
       plat(0, G, 480, 110, t),
       plat(580, G, 300, 110, t),
-      plat(980, G - 90, 200, 80, t),
-      plat(1180, G - 100, 42, 120, t, { gate: "spores" }),
-      plat(1222, G - 90, 180, 80, t),
+      plat(980, G - 90, 200, 36, t),
+      plat(1180, G - 230, 222, 28, t),
+      plat(1180, G - 202, 42, 132, t, { gate: "spores" }),
+      plat(1360, G - 202, 42, 132, t),
+      plat(1180, G - 90, 222, 36, t),
       plat(1000, G, 620, 110, t),
       plat(1740, G, 340, 110, t),
       plat(2180, G - 40, 250, 80, t),
@@ -482,6 +492,7 @@ function buildLevel(zone) {
       plat(0, G, 520, 110, t),
       plat(630, G - 50, 260, 90, t),
       plat(990, G, 420, 110, t),
+      plat(1410, G, 270, 110, t),
       plat(1470, G - 270, 34, 200, t),
       plat(1588, G - 270, 34, 200, t),
       plat(1504, G - 246, 84, 28, t),
@@ -499,10 +510,10 @@ function buildLevel(zone) {
   } else if (zone.id === "coracao") {
     L.platforms = [
       plat(0, G, 400, 110, t),
-      plat(400, G - 160, 42, 160, t, { gate: "shot" }),
+      plat(400, G - 58, 42, 58, t, { gate: "shot" }),
       plat(442, G, 200, 110, t),
-      plat(642, G - 210, 40, 230, t),
-      plat(160, G - 84, 760, 58, t),
+      plat(642, G - 58, 40, 80, t),
+      plat(160, G - 84, 760, 26, t),
       plat(1020, G - 40, 240, 80, t),
       plat(1360, G, 460, 110, t),
       plat(1920, G - 60, 260, 80, t),
@@ -623,7 +634,7 @@ function startLevel(zone, tier, replay) {
 function makePlayer(x, y) {
   return {
     x, y, vx: 0, vy: 0, dir: 1, hw: 13, h: 46,
-    onGround: true, coyote: 0.12, jumpBuf: 0, jumpsLeft: 0,
+    onGround: true, coyote: 0.12, jumpBuf: 0, jumpsLeft: 1, jumpLock: 0,
     wallDir: 0, wallCoy: 0,
     atk: 0, atkCd: 0, swing: 0,
     hurt: 0, dash: 0, dashCd: 0, dashDir: 1,
@@ -783,7 +794,7 @@ function updatePlayer(dt) {
   if (pressed.Space || pressed.ArrowUp || pressed.KeyW) player.jumpBuf = 0.13;
 
   const canGround = player.coyote > 0;
-  const canDouble = has("double") && player.jumpsLeft > 0 && !player.onGround;
+  const canDouble = player.jumpsLeft > 0 && !player.onGround;
   const canWall = has("wall") && player.wallCoy > 0 && !player.onGround;
   if (player.jumpBuf > 0 && player.dash <= 0 && (canGround || canDouble || canWall)) {
     if (canWall && !canGround) {
@@ -791,24 +802,26 @@ function updatePlayer(dt) {
       player.vy = -600;
       player.vx = away * 300;
       player.dir = away;
-      player.jumpsLeft = has("double") ? 1 : 0;
+      player.jumpsLeft = 1;
       player.wallCoy = 0;
     } else if (canGround) {
       player.vy = -620;
-      player.jumpsLeft = has("double") ? 1 : 0;
+      player.jumpsLeft = 1;
       player.coyote = 0;
     } else {
-      player.vy = -580;
+      player.vy = has("double") ? -700 : -640;
       player.jumpsLeft -= 1;
-      burst(player.x, player.y, 3, 2);
+      burst(player.x, player.y - 20, 3, 3);
     }
+    player.jumpLock = 0.14;
     player.jumpBuf = 0;
     player.onGround = false;
     player.slam = false;
     sfx("jump");
   }
+  player.jumpLock = Math.max(0, (player.jumpLock || 0) - dt);
   const holding = down.Space || down.ArrowUp || down.KeyW;
-  if (!holding && player.vy < -200) player.vy = -200;
+  if (player.jumpLock <= 0 && !holding && player.vy < -460) player.vy = -460;
 
   if ((pressed.ShiftLeft || pressed.ShiftRight) && has("dash") && player.dashCd <= 0 && player.dash <= 0) {
     player.dash = 0.18;
@@ -871,8 +884,10 @@ function updatePlayer(dt) {
     if (blockedAt(player.x + player.hw + 3, player.y - 16)) player.wallDir = 1;
     else if (blockedAt(player.x - player.hw - 3, player.y - 16)) player.wallDir = -1;
   }
-  if (player.onGround) player.coyote = 0.12;
-  else player.coyote = Math.max(0, player.coyote - dt);
+  if (player.onGround) {
+    player.coyote = 0.12;
+    player.jumpsLeft = 1;
+  } else player.coyote = Math.max(0, player.coyote - dt);
   if (player.wallDir) player.wallCoy = 0.12;
   else player.wallCoy = Math.max(0, player.wallCoy - dt);
 
@@ -936,7 +951,9 @@ function updateEnemies(dt) {
         if (!supported(ahead, e.y) || blockedAt(ahead, e.y - 16)) e.dir *= -1;
       }
     } else if (e.ai === "shooter") {
-      e.dir = player.x < e.x ? -1 : 1;
+      const want = player.x < e.x ? -1 : 1;
+      const ahead = e.x + want * (e.hw + 10);
+      e.dir = e.onGround && !supported(ahead, e.y) ? -want : want;
       e.vx = e.dir * e.speed * 0.35;
       if (e.timer <= 0 && see) {
         e.timer = 2.15;
@@ -950,10 +967,6 @@ function updateEnemies(dt) {
       }
       e.vy += 1900 * dt;
       moveBody(e, dt);
-      if (e.onGround) {
-        const ahead = e.x + e.dir * (e.hw + 8);
-        if (!supported(ahead, e.y)) e.vx = 0;
-      }
     } else {
       e.vx = e.dir * e.speed;
       if (e.ai === "hopper" && e.onGround && e.timer <= 0) {
@@ -968,6 +981,8 @@ function updateEnemies(dt) {
         if (!supported(ahead, e.y) || blockedAt(ahead, e.y - 12)) e.dir *= -1;
       }
     }
+    if (!e.fly && e.y > 700) e.gone = true;
+    if (e.gone) continue;
     if (e.touch <= 0 && player.hurt <= 0 && Math.abs(player.x - e.x) < e.hw + player.hw && Math.abs((player.y - player.h / 2) - (e.y - e.h / 2)) < (player.h + e.h) / 2) {
       e.touch = 0.6;
       hurtPlayer(e.dmg, e.x);
@@ -976,7 +991,7 @@ function updateEnemies(dt) {
   if (player.atk > 0.05 && player.atk < 0.18) {
     const box = meleeBox();
     for (const e of world.enemies) {
-      if (e.lastSwing === player.swing) continue;
+      if (e.gone || e.lastSwing === player.swing) continue;
       const eb = { x: e.x - e.hw, y: e.y - e.h, w: e.hw * 2, h: e.h };
       if (rects(box, eb)) {
         e.lastSwing = player.swing;
@@ -1214,8 +1229,6 @@ function updateHazards(dt) {
       }
     }
   }
-  // Boss projectiles were given unscaled dmg and the formula above cancelled the tier.
-  // Reapply properly below by fixing hurt on proj in a cleaner second thought:
   world.hazards = world.hazards.filter((h) => h.permanent || h.life > 0);
   world.platforms = world.platforms.filter((p) => !p.dead);
 }
@@ -1236,6 +1249,7 @@ function updateDrops(dt) {
       persist();
       floatText(d.x, d.y - 10, "+" + d.value, "#9fd8ff");
       sfx("coin");
+      if (healFraction(0.5)) floatText(d.x, d.y - 28, "meia vida", "#b6ffb0");
       d.life = 0;
     }
   }
@@ -1260,6 +1274,7 @@ function tryChests() {
       persist();
       sfx("coin");
       floatText(c.x, c.y - 40, "+" + c.value + " baú", "#9fd8ff");
+      if (healFraction(1)) floatText(c.x, c.y - 58, "vida cheia", "#b6ffb0");
     }
   }
 }
@@ -1657,15 +1672,16 @@ function drawHUD() {
   blit(S.items[2], 210, 96, 20, false, true);
   screenText(String(save.potions), 224, 92, 8, "#b6ffb0", "left");
   const icons = [
-    ["double", "salto"],
-    ["dash", "dash"],
-    ["spores", "esporo"],
-    ["wall", "parede"],
-    ["shot", "tiro"],
+    ["pulo", "pulo", true],
+    ["double", "raiz", false],
+    ["dash", "dash", false],
+    ["spores", "esporo", false],
+    ["wall", "parede", false],
+    ["shot", "tiro", false],
   ];
   let ix = 100;
-  icons.forEach(([id, label]) => {
-    if (!has(id)) return;
+  icons.forEach(([id, label, always]) => {
+    if (!always && !has(id)) return;
     screenText(label, ix + 16, 112, 7, "#d5e6cf");
     ix += 78;
   });
@@ -1680,7 +1696,7 @@ function interactPromptLevel() {
   if (!world.chests) return;
   for (const c of world.chests) {
     if (save.chests[c.id]) continue;
-    if (Math.abs(player.x - c.x) < 36) screenText("E  Baú", c.x - cam.x, c.y - 48, 8, "#fff6df");
+    if (Math.abs(player.x - c.x) < 36) screenText("E  Baú + vida", c.x - cam.x, c.y - 48, 8, "#fff6df");
   }
 }
 
@@ -1736,7 +1752,7 @@ function bootUI() {
   document.getElementById("ending-ok").onclick = () => startHub();
   document.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => {
     if (mode === "title") closePanels();
-    else closePanels();
+    else openPanel("pause");
   }));
   window.addEventListener("keydown", (e) => {
     if (e.code === "Escape" && uiOpen && mode !== "title") {
