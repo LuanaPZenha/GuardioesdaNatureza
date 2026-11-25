@@ -51,6 +51,12 @@ TALKS = {
         ("boss", "Um garoto e um cajado contra a serra?"),
         ("kai", "Contra a serra. E contra você."),
     ],
+    "mares": [
+        ("boss", "O mar aguenta. Mais um carregamento de lixo não muda nada."),
+        ("kai", "Muda para quem vive aí embaixo. A água vai ficar limpa."),
+        ("boss", "Então nada até cansar, guardião."),
+        ("kai", "Eu atravesso. A costa respira de novo."),
+    ],
 }
 
 RESTORE = {
