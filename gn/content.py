@@ -83,6 +83,15 @@ TALKS = {
     ],
 }
 
+CHEERS = {
+    "floresta": "A mata fica!",
+    "mares": "A água clareou!",
+    "pantano": "O pântano vive!",
+    "montanhas": "O santuário fica de pé!",
+    "coracao": "O cristal acendeu!",
+    "industrial": "A fornalha apagou!",
+}
+
 RESTORE = {
     "floresta": "As árvores queimadas e os troncos cortados voltaram a ser uma floresta frondosa.",
     "mares": "A água poluída clareou. O lixo sumiu e os peixes voltaram às marés.",
