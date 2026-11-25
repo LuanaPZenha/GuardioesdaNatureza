@@ -483,6 +483,7 @@ def draw_title():
     buttons = [("Jogar", sim.start_hub), ("Controles", sim.open_how), ("Créditos", sim.open_credits)]
     if sim.G.has_save:
         buttons.append(("Novo jogo", sim.confirm_new))
+    buttons.append(("Sair", sim.quit_game))
     y = 278
     for i, (label, fn) in enumerate(buttons):
         rect = pygame.Rect(36, y, 280, 36)
