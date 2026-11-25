@@ -77,3 +77,52 @@ def _calm():
     buf += pad * fade
     return _sound(buf)
 
+
+def _boss():
+    seconds = 8.0
+    n = int(RATE * seconds)
+    t = np.arange(n, dtype=np.float32) / RATE
+    trem = 0.72 + 0.28 * np.sin(2 * np.pi * 0.25 * t)
+    buf = np.sin(2 * np.pi * 73.5 * t) * 0.2 * trem
+    buf += np.sin(2 * np.pi * 78 * t) * 0.11 * trem
+    buf += (2 * ((t * 55) % 1) - 1) * 0.05 * trem
+    for hit in (0, 1.6, 3.2, 4.8, 6.4):
+        _add(buf, hit, 0.09, 48, "sine", 0.55)
+        _add(buf, hit + 0.2, 0.07, 42, "sine", 0.38)
+        _add(buf, hit + 0.72, 0.12, 110, "saw", 0.08)
+    motif = [
+        (0.45, 0.7, 622.25),
+        (2.2, 0.65, 587.33),
+        (4.05, 0.6, 523.25),
+        (5.85, 0.9, 466.16),
+        (7.15, 0.28, 622.25),
+        (7.15, 0.28, 659.25),
+    ]
+    for start, dur, freq in motif:
+        _add(buf, start, dur, freq, "saw", 0.09)
+        _add(buf, start, dur, freq * 0.5, "square", 0.05)
+    return _sound(buf)
+
+
+def start():
+    global _channel, _tracks
+    if not pygame.mixer.get_init():
+        return
+    pygame.mixer.set_reserved(1)
+    _channel = pygame.mixer.Channel(0)
+    try:
+        _tracks = {"calm": _calm(), "boss": _boss()}
+    except pygame.error:
+        _tracks = {}
+        return
+    play("calm")
+
+
+def play(kind):
+    global _current
+    sound = _tracks.get(kind)
+    if sound is None or _channel is None or _current == kind:
+        return
+    _current = kind
+    _channel.set_volume(0.55 if kind == "boss" else 0.42)
+    _channel.play(sound, loops=-1, fade_ms=280)
