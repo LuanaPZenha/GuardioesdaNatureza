@@ -115,16 +115,19 @@ def on_click(pos):
         if rect.collidepoint(pos):
             fn()
             return
+    sim.G.pressed["Click"] = True
 
 
 def main():
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    if not getattr(sys, "frozen", False):
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
     pygame.init()
     try:
         pygame.mixer.init(22050, -16, 1, 512)
         sim.G.sounds = load_sounds()
     except pygame.error:
         sim.G.sounds = {}
+    music.start()
     screen = pygame.display.set_mode((VW, VH), pygame.SCALED)
     pygame.display.set_caption("Guardiões da Natureza")
     sim.G.screen = screen
@@ -157,6 +160,8 @@ def main():
                 sim.start_level(ZONES[0], TIERS[0], False)
             elif frames > 30:
                 running = False
+        if sim.G.want_quit:
+            running = False
         sim.step(dt)
         view.render()
         pygame.display.flip()
