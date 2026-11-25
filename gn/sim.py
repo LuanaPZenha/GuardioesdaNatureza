@@ -143,18 +143,25 @@ def spawn_enemy(kind, x, y, zone, tier):
     }
 
 
+def boss_scale(stat):
+    """O grau ainda fortalece o chefe, mas só metade do que fortalece os inimigos."""
+    return 1 + (stat - 1) * 0.5
+
+
 def make_boss(zone, tier, pos):
-    hp = round(zone["bossHp"] * tier["hp"])
+    hp = round(zone["bossHp"] * boss_scale(tier["hp"]))
     return {
         "def": zone, "x": pos["x"], "y": pos["y"], "vx": 0, "vy": 0, "dir": -1,
         "hp": hp, "max": hp, "hw": zone["bossHw"], "h": zone["bossH"],
         "phase": 1, "state": "wait", "t": 0, "step": 0, "pattern": "",
         "aimX": pos["x"], "aimY": pos["y"] - 40, "lastSwing": -1,
         "dying": 0, "rewarded": False, "flash": 0, "hop": False, "wind": 0,
+        "line": 0, "chars": 0,
     }
 
 
 def start_hub():
+    music.play("calm")
     G.mode = "hub"
     G.world = build_hub()
     idx = next((i for i, z in enumerate(ZONES) if z["id"] == G.save["pendingZone"]), -1)
@@ -174,6 +181,7 @@ def start_hub():
 
 
 def start_level(zone, tier, replay):
+    music.play("calm")
     G.mode = "level"
     world = build_level(zone, G.sprites)
     world["tier"] = tier
