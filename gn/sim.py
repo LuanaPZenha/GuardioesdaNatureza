@@ -2,9 +2,10 @@
 import math
 import random
 
+from gn import music
 from gn.content import (
     ABILITIES, GROUND, PORTAL_X, RESTORE, SHOP_ITEMS, TIER_FINAL, VW, ZONES,
-    blank_world, build_level, cleared_count, clamp, persist, plat, preview_tier, zone_by_id,
+    CHEERS, TALKS, blank_world, build_level, cleared_count, clamp, persist, plat, preview_tier, zone_by_id,
 )
 
 class Game:
