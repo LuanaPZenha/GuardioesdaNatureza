@@ -1,12 +1,26 @@
 """Dados, fases e carregamento dos sprites."""
 import json
 import os
+import sys
 
 import numpy as np
 import pygame
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ASSET = os.path.join(ROOT, "assets")
+
+def _install_dir():
+    if getattr(sys, "frozen", False):
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def _bundle_dir():
+    if getattr(sys, "frozen", False):
+        return getattr(sys, "_MEIPASS", _install_dir())
+    return _install_dir()
+
+
+ROOT = _install_dir()
+ASSET = os.path.join(_bundle_dir(), "assets")
 SAVE_PATH = os.path.join(ROOT, "save.json")
 
 VW, VH = 960, 540
