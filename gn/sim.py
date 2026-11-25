@@ -26,6 +26,7 @@ class Game:
     sounds = {}
     hits = []
     screen = None
+    want_quit = False
 
 
 G = Game()
@@ -35,6 +36,10 @@ def sfx(name):
     sound = G.sounds.get(name)
     if sound:
         sound.play()
+
+
+def quit_game():
+    G.want_quit = True
 
 
 def has(ability):
@@ -98,7 +103,7 @@ def make_player(x, y):
         "onGround": True, "coyote": 0.12, "jumpBuf": 0, "jumpsLeft": 1, "jumpLock": 0,
         "wallDir": 0, "wallCoy": 0, "atk": 0, "atkCd": 0, "swing": 0,
         "hurt": 0, "dash": 0, "dashCd": 0, "dashDir": 1, "slam": False, "shotCd": 0,
-        "hp": max_hp(), "anim": 0, "blocked": False,
+        "hp": max_hp(), "anim": 0, "blocked": False, "cheer": 0,
     }
 
 
