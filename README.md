@@ -42,3 +42,29 @@ python --version
 ```
 
 O resultado esperado é Python 3.13.x. Se o comando não for encontrado, feche o terminal, reinstale o Python com o PATH marcado e abra o terminal de novo.
+
+## 3. Instalar as bibliotecas
+
+Ainda na pasta do projeto:
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
+Esse comando instala o Pygame e o NumPy. Espere ele terminar sem mensagem de erro.
+
+## 4. Abrir o jogo
+
+```powershell
+python main.py
+```
+
+A primeira tela é o título.
+
+- **Jogar** entra no santuário.
+- **Controles** lista as teclas.
+- **Créditos** mostra o contexto da aventura.
+- **Novo jogo** só aparece quando já existe progresso. Apaga cristais, habilidades e regiões restauradas.
+- **Sair** fecha o programa.
+
+Na primeira visita ao santuário, Lumi explica os portais, a loja e a cura. O botão **Entendi** fecha esse painel e não o mostra de novo.
