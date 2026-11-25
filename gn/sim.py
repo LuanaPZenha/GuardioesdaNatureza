@@ -697,7 +697,39 @@ def update_boss(dt):
         boss["dying"] -= dt
         boss["y"] += 30 * dt
         if boss["dying"] <= 0:
+            boss["state"] = "cheer"
+            boss["t"] = 1.8
+            G.player["cheer"] = boss["t"]
+            music.play("calm")
+        return
+    if boss["state"] == "cheer":
+        boss["t"] -= dt
+        G.player["cheer"] = max(0, boss["t"])
+        G.player["vx"] = 0
+        if int(boss["t"] * 5) != int((boss["t"] + dt) * 5):
+            burst(G.player["x"], G.player["y"] - 50, 7, 5)
+        if boss["t"] <= 0:
+            G.player["cheer"] = 0
             defeat_boss()
+        return
+    if boss["state"] == "talk":
+        lines = TALKS[boss["def"]["id"]]
+        line = lines[boss["line"]][1]
+        boss["chars"] = min(len(line), boss["chars"] + dt * 34)
+        boss["dir"] = -1 if G.player["x"] < boss["x"] else 1
+        done = boss["chars"] >= len(line)
+        pressed = any(G.pressed.get(key) for key in ("KeyE", "KeyJ", "Space", "Enter", "Click"))
+        if pressed and not done:
+            boss["chars"] = len(line)
+        elif pressed and done:
+            boss["line"] += 1
+            boss["chars"] = 0
+            if boss["line"] >= len(lines):
+                boss["state"] = "intro"
+                boss["t"] = 0.85
+                G.world["banner"] = boss["def"]["bossName"]
+                G.world["bannerT"] = 2.2
+                sfx("roar")
         return
     arena = G.world["arena"]
     if not arena["locked"] or boss["state"] == "wait":
@@ -705,15 +737,17 @@ def update_boss(dt):
     player = G.player
     boss["dir"] = -1 if player["x"] < boss["x"] else 1
     if boss["state"] != "intro":
-        if player["hurt"] <= 0 and abs(player["x"] - boss["x"]) < boss["hw"] + player["hw"] - 8 and player["y"] > boss["y"] - boss["h"] and player["y"] - player["h"] < boss["y"]:
-            hurt_player(round(14 * G.world["tier"]["dmg"] * (1.12 if boss["phase"] > 1 else 1)), boss["x"])
+        touch = boss["hw"] * 0.58 + player["hw"]
+        if player["hurt"] <= 0 and abs(player["x"] - boss["x"]) < touch and player["y"] > boss["y"] - boss["h"] * 0.75 and player["y"] - player["h"] < boss["y"]:
+            phase = 1.08 if boss["phase"] > 1 else 1
+            hurt_player(max(1, round(8 * boss_scale(G.world["tier"]["dmg"]) * phase)), boss["x"])
         if boss["def"].get("orbit") and boss["phase"] >= 2:
-            ang = G.time * 3.2
+            ang = G.time * 2.2
             for i in range(2):
                 ox = boss["x"] + math.cos(ang + i * math.pi) * 92
                 oy = boss["y"] - 70 + math.sin(ang + i * math.pi) * 26
-                if player["hurt"] <= 0 and math.hypot(player["x"] - ox, (player["y"] - 24) - oy) < 22:
-                    hurt_player(round(10 * G.world["tier"]["dmg"]), ox)
+                if player["hurt"] <= 0 and math.hypot(player["x"] - ox, (player["y"] - 24) - oy) < 18:
+                    hurt_player(max(1, round(6 * boss_scale(G.world["tier"]["dmg"]))), ox)
     if boss["state"] == "intro":
         boss["t"] -= dt
         if boss["t"] <= 0:
