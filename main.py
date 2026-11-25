@@ -5,11 +5,12 @@ Rode com: python main.py
 import math
 import os
 import struct
+import sys
 
 import pygame
 
 from gn.content import SAVE_PATH, TIERS, VW, VH, ZONES, load_all, load_save
-from gn import sim, view
+from gn import music, sim, view
 
 
 def make_beep(freq, duration, kind, volume):
