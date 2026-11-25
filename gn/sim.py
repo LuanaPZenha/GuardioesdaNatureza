@@ -626,42 +626,42 @@ def spawn_pattern(boss):
     pattern = boss["pattern"]
     if pattern == "saws":
         for i in range(3):
-            G.world["hazards"].append(spr(1, {"x": boss["x"], "y": floor - 36 - i * 34, "vx": direction * 280, "vy": 0, "dmg": 12, "spin": True}))
+            G.world["hazards"].append(spr(1, {"x": boss["x"], "y": floor - 36 - i * 34, "vx": direction * 200, "vy": 0, "dmg": 8, "spin": True}))
     elif pattern in ("charge", "roll"):
-        boss["vx"] = direction * (520 if pattern == "roll" else 430)
+        boss["vx"] = direction * (380 if pattern == "roll" else 300)
         boss["t"] = 0.7 if pattern == "roll" else 0.55
     elif pattern == "slam":
         r = 62
-        G.world["hazards"].append({"kind": "zone", "x": boss["aimX"] - r, "y": floor - 36, "w": r * 2, "h": 40, "dmg": 14, "warn": 0.42, "life": 0.62, "spr": 7, "next": 0})
+        G.world["hazards"].append({"kind": "zone", "x": boss["aimX"] - r, "y": floor - 36, "w": r * 2, "h": 40, "dmg": 9, "warn": 0.55, "life": 0.72, "spr": 7, "next": 0, "boss": True})
     elif pattern == "spit":
         for i in range(-1, 2):
-            G.world["hazards"].append(spr(2, {"x": boss["x"] + direction * 20, "y": boss["y"] - 90, "vx": direction * 180 + i * 50, "vy": -300, "grav": 720, "dmg": 11}))
+            G.world["hazards"].append(spr(2, {"x": boss["x"] + direction * 20, "y": boss["y"] - 90, "vx": direction * 140 + i * 40, "vy": -260, "grav": 720, "dmg": 8}))
     elif pattern == "tire":
-        G.world["hazards"].append(spr(2, {"x": boss["x"], "y": floor - 18, "vx": direction * 340, "vy": 0, "dmg": 12, "r": 16}))
+        G.world["hazards"].append(spr(2, {"x": boss["x"], "y": floor - 18, "vx": direction * 250, "vy": 0, "dmg": 8, "r": 16}))
     elif pattern == "suction":
-        boss["t"] = 1.15
-        G.world["hazards"].append({"kind": "zone", "x": boss["aimX"] - 50, "y": floor - 34, "w": 100, "h": 34, "dmg": 10, "warn": 0.35, "life": 0.9, "spr": 2, "next": 0})
+        boss["t"] = 0.85
+        G.world["hazards"].append({"kind": "zone", "x": boss["aimX"] - 50, "y": floor - 34, "w": 100, "h": 34, "dmg": 7, "warn": 0.4, "life": 0.7, "spr": 2, "next": 0, "boss": True})
     elif pattern == "clouds":
         for i in range(3):
-            G.world["hazards"].append(spr(3, {"x": boss["x"], "y": boss["y"] - 80, "vx": direction * 90 + (i - 1) * 40, "vy": -30 - i * 20, "dmg": 10, "life": 4, "r": 18}))
+            G.world["hazards"].append(spr(3, {"x": boss["x"], "y": boss["y"] - 80, "vx": direction * 70 + (i - 1) * 36, "vy": -30 - i * 16, "dmg": 7, "life": 2.6, "r": 16}))
     elif pattern == "hop":
         boss["vy"] = -560
         boss["vx"] = direction * 180
         boss["hop"] = True
         boss["t"] = 1.4
     elif pattern in ("rain", "icicles"):
-        for _ in range(4):
+        for _ in range(3):
             x = arena["x"] + 80 + random.random() * (arena["w"] - 160)
             G.world["hazards"].append({
-                "kind": "zone", "x": x - 28, "y": floor - 36, "w": 56, "h": 40, "dmg": 12,
-                "warn": 0.62, "life": 0.86, "spr": 3 if pattern == "rain" else 4, "next": 0,
+                "kind": "zone", "x": x - 28, "y": floor - 36, "w": 56, "h": 40, "dmg": 8,
+                "warn": 0.72, "life": 0.95, "spr": 3 if pattern == "rain" else 4, "next": 0, "boss": True,
             })
     elif pattern in ("shards", "ring"):
-        n = 8 if pattern == "ring" else 5
+        n = 6 if pattern == "ring" else 4
         for i in range(n):
             ang = (i / n) * math.pi * 2 if pattern == "ring" else (-0.7 + i * 0.35)
             G.world["hazards"].append(spr(5 if pattern == "ring" else 4, {
-                "x": boss["x"], "y": boss["y"] - 80, "vx": math.cos(ang) * 230, "vy": math.sin(ang) * 230, "dmg": 11,
+                "x": boss["x"], "y": boss["y"] - 80, "vx": math.cos(ang) * 180, "vy": math.sin(ang) * 180, "dmg": 8,
             }))
     elif pattern == "wind":
         boss["t"] = 1.2
@@ -669,16 +669,16 @@ def spawn_pattern(boss):
     elif pattern in ("beam", "laser"):
         y = clamp(boss["aimY"], 180, floor - 50)
         left = min(boss["x"], boss["x"] + direction * 640)
-        G.world["hazards"].append({"kind": "zone", "x": left, "y": y - 14, "w": 640, "h": 28, "dmg": 16, "warn": 0.4, "life": 0.72, "spr": 5, "beam": True, "next": 0})
+        G.world["hazards"].append({"kind": "zone", "x": left, "y": y - 14, "w": 640, "h": 28, "dmg": 10, "warn": 0.55, "life": 0.7, "spr": 5, "beam": True, "next": 0, "boss": True})
     elif pattern == "blink":
         nx = G.player["x"] + (150 if G.player["x"] < boss["x"] else -150)
         boss["x"] = clamp(nx, arena["x"] + 100, arena["x"] + arena["w"] - 100)
-        G.world["hazards"].append({"kind": "zone", "x": boss["x"] - 60, "y": floor - 40, "w": 120, "h": 40, "dmg": 14, "warn": 0.28, "life": 0.5, "spr": 7, "next": 0})
+        G.world["hazards"].append({"kind": "zone", "x": boss["x"] - 60, "y": floor - 40, "w": 120, "h": 40, "dmg": 9, "warn": 0.4, "life": 0.55, "spr": 7, "next": 0, "boss": True})
     elif pattern == "missile":
         for i in range(2):
-            G.world["hazards"].append(spr(6, {"x": boss["x"], "y": boss["y"] - 70 - i * 20, "vx": direction * 80, "vy": -40, "dmg": 13, "homing": True, "life": 4}))
+            G.world["hazards"].append(spr(6, {"x": boss["x"], "y": boss["y"] - 70 - i * 20, "vx": direction * 60, "vy": -30, "dmg": 8, "homing": True, "life": 2.2}))
     elif pattern == "pound":
-        G.world["hazards"].append({"kind": "zone", "x": arena["x"] + 20, "y": floor - 34, "w": arena["w"] - 40, "h": 34, "dmg": 15, "warn": 0.55, "life": 0.85, "spr": 7, "next": 0})
+        G.world["hazards"].append({"kind": "zone", "x": arena["x"] + 20, "y": floor - 34, "w": arena["w"] - 40, "h": 34, "dmg": 10, "warn": 0.7, "life": 0.85, "spr": 7, "next": 0, "boss": True})
     elif pattern == "summon" and len(G.world["enemies"]) < 3:
         G.world["enemies"].append(spawn_enemy(0, arena["x"] + 180, floor, boss["def"], G.world["tier"]))
         G.world["enemies"].append(spawn_enemy(2, arena["x"] + arena["w"] - 180, floor, boss["def"], G.world["tier"]))
