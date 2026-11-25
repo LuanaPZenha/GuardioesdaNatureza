@@ -57,6 +57,12 @@ TALKS = {
         ("boss", "Então nada até cansar, guardião."),
         ("kai", "Eu atravesso. A costa respira de novo."),
     ],
+    "pantano": [
+        ("boss", "O veneno já desceu. O pântano gosta de mim agora."),
+        ("kai", "Ele não gosta. Ele está doente. Eu corto a podridão."),
+        ("boss", "Chegue perto. O ar também morde."),
+        ("kai", "Então eu prendo a respiração e sigo."),
+    ],
 }
 
 RESTORE = {
