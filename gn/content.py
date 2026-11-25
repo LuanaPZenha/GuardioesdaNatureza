@@ -63,6 +63,12 @@ TALKS = {
         ("boss", "Chegue perto. O ar também morde."),
         ("kai", "Então eu prendo a respiração e sigo."),
     ],
+    "montanhas": [
+        ("boss", "O santuário rachou. O inverno fica com o que sobrou."),
+        ("kai", "Rachado ainda é casa. Eu devolvo as pedras ao lugar."),
+        ("boss", "O frio não devolve nada."),
+        ("kai", "Eu devolvo."),
+    ],
 }
 
 RESTORE = {
