@@ -92,3 +92,38 @@ Controles durante a partida:
 | Clique | Apertar o botão sob o cursor |
 
 As habilidades novas só passam a existir depois da primeira vitória da região que as entrega. Setas e Enter também funcionam no título e nos painéis.
+
+## Progresso salvo
+
+O jogo grava `save.json` na pasta de onde ele foi iniciado.
+
+Na versão `python main.py`, o arquivo fica na raiz do projeto. No executável, fica na mesma pasta do `.exe`. Cristais, compras, poções, regiões limpas, habilidades e baús abertos estão nesse arquivo. A vida da tentativa não é salva: morrer recomeça a região.
+
+Apagar `save.json` zera o progresso. **Novo jogo**, no título, faz o mesmo.
+
+## Atalho pelo executável
+
+Se `dist\GuardioesDaNatureza.exe` já estiver na pasta, dê dois cliques nele. Não é preciso instalar Python para essa forma de abrir.
+
+A primeira abertura demora mais, porque o executável se descompacta. As seguintes abrem direto. O `save.json` desse atalho não é o mesmo da versão `python main.py` se os dois estiverem em pastas diferentes.
+
+## Pastas
+
+- `main.py` abre a janela, lê o teclado e o mouse e mantém o quadro.
+- `gn/content.py` guarda regiões, loja, fases, imagens e o save.
+- `gn/sim.py` guarda jogador, inimigos, chefes e progressão.
+- `gn/view.py` desenha o jogo e os painéis.
+- `gn/music.py` gera a música de exploração e a do chefe.
+- `assets/` guarda as imagens JPG.
+- `dist/GuardioesDaNatureza.exe` é o atalho de Windows, quando já foi gerado.
+
+## Gerar o executável de novo
+
+Este passo não é necessário para jogar. Com o Python e as bibliotecas já instalados:
+
+```powershell
+python -m pip install pyinstaller
+python -m PyInstaller --noconfirm --windowed --onefile --name "GuardioesDaNatureza" --add-data "assets;assets" main.py
+```
+
+O arquivo novo aparece em `dist\GuardioesDaNatureza.exe`.
