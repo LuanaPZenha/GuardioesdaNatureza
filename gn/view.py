@@ -175,7 +175,11 @@ def draw_platform(p):
 def draw_player():
     player = sim.G.player
     sprites = sim.G.sprites
-    if player["hurt"] > 0.4:
+    hop = 0
+    if player.get("cheer", 0) > 0:
+        hop = abs(math.sin(sim.G.time * 14)) * 26
+        frame = 2
+    elif player["hurt"] > 0.4:
         frame = 4
     elif player["atk"] > 0:
         frame = 3
@@ -192,7 +196,10 @@ def draw_player():
     if player["hurt"] > 0 and int(sim.G.time * 16) % 2 == 0:
         spr = spr.copy()
         spr.set_alpha(115)
-    blit(spr, player["x"], player["y"], 86, player["dir"] == -1)
+    blit(spr, player["x"], player["y"] - hop, 86, player["dir"] == -1)
+    if hop > 8:
+        blit(sprites["fx"][7], player["x"] - 18, player["y"] - 58 - hop, 22, False)
+        blit(sprites["fx"][7], player["x"] + 18, player["y"] - 70 - hop, 18, True)
     if player["atk"] > 0.05:
         blit(sprites["fx"][0], player["x"] + player["dir"] * 34, player["y"] - 16, 36, player["dir"] == -1)
     if player["dash"] > 0:
@@ -201,9 +208,10 @@ def draw_player():
 
 def draw_lumi():
     player = sim.G.player
+    hop = abs(math.sin(sim.G.time * 14)) * 18 if player.get("cheer", 0) > 0 else 0
     frame = 2 if int(sim.G.time * 3) % 3 == 2 else 0
     frames = sim.G.sprites["lumi"]
-    blit(frames[min(frame, len(frames) - 1)], player["x"] - player["dir"] * 28, player["y"] - 62 + math.sin(sim.G.time * 4) * 4, 42, False)
+    blit(frames[min(frame, len(frames) - 1)], player["x"] - player["dir"] * 28, player["y"] - 62 - hop + math.sin(sim.G.time * 4) * 4, 42, False)
 
 
 def draw_enemy(enemy):
@@ -231,12 +239,17 @@ def draw_boss(boss):
                 boss["y"] - 70 + math.sin(ang + i * math.pi) * 26,
                 28, False,
             )
-    if not arena["locked"]:
+    if not arena["locked"] or boss["state"] in ("talk", "cheer", "dead"):
         return
-    screen_text(boss["def"]["bossName"], VW / 2, 22, 11)
-    screen_text(boss["def"]["bossSub"] + "  ·  fase " + str(boss["phase"]), VW / 2, 40, 8, "#d5e6cf")
+    plate_lines(
+        [
+            (boss["def"]["bossName"], "#fff8ea"),
+            (boss["def"]["bossSub"] + "  ·  fase " + str(boss["phase"]), "#ffd0a1"),
+        ],
+        VW / 2, 6,
+    )
     col = "#ffb020" if boss["phase"] >= 3 else "#ff7a3c" if boss["phase"] == 2 else "#e23d4a"
-    draw_bar(VW / 2 - 220, 50, 440, 14, boss["hp"] / max(1, boss["max"]), col, "#2a1218")
+    draw_bar(VW / 2 - 220, 58, 440, 14, boss["hp"] / max(1, boss["max"]), col, "#2a1218")
     if boss["state"] == "tell":
         label = "PULO!" if boss["pattern"] == "pound" else "!"
         screen_text(label, boss["x"] - sim.G.camx + OX, boss["y"] - boss["h"] - 16, 12, "#ffd0a1")
