@@ -75,6 +75,12 @@ TALKS = {
         ("boss", "Então quebre junto com ela."),
         ("kai", "Eu quebro a lança. O coração fica."),
     ],
+    "industrial": [
+        ("boss", "A fumaça é o preço. O vale trabalha, o resto se acostuma."),
+        ("kai", "Ninguém se acostuma a não respirar. Esta fornalha apaga hoje."),
+        ("boss", "Apague, se conseguir chegar perto."),
+        ("kai", "As outras cinco já voltaram. Agora é a sua vez."),
+    ],
 }
 
 RESTORE = {
