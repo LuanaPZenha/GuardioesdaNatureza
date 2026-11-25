@@ -69,6 +69,12 @@ TALKS = {
         ("boss", "O frio não devolve nada."),
         ("kai", "Eu devolvo."),
     ],
+    "coracao": [
+        ("boss", "O cristal apagou. Sem luz, ninguém acha o caminho."),
+        ("kai", "A luz não acabou. Está presa em você. Eu solto."),
+        ("boss", "Então quebre junto com ela."),
+        ("kai", "Eu quebro a lança. O coração fica."),
+    ],
 }
 
 RESTORE = {
