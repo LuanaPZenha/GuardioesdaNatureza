@@ -68,3 +68,27 @@ A primeira tela é o título.
 - **Sair** fecha o programa.
 
 Na primeira visita ao santuário, Lumi explica os portais, a loja e a cura. O botão **Entendi** fecha esse painel e não o mostra de novo.
+
+## 5. Como jogar
+
+No santuário, aproxime-se de um portal e pressione **E**. O Vale Industrial fica selado até as outras cinco regiões serem restauradas. A loja também abre com **E**, no balcão do santuário.
+
+Dentro da região, Kai começa à esquerda. O chefe espera na arena do fim. Quando Kai passa da trava, a arena fecha e a música muda. A vida do chefe em 0 restaura a região. A vida de Kai em 0 encerra a tentativa: os cristais já guardados continuam no save.
+
+Controles durante a partida:
+
+| Tecla | Ação |
+|---|---|
+| A D ou setas esquerda e direita | Andar |
+| Espaço, W ou seta para cima | Pular. O mesmo botão no ar faz o segundo pulo |
+| J | Ataque |
+| Seta para baixo + J, no ar | Esporos, depois do pântano |
+| Shift | Dash, depois das marés |
+| K | Tiro, depois do Coração do Planeta |
+| Q | Poção, dentro da região |
+| E | Loja, portal ou baú |
+| Esc | Pausa |
+| Setas ou W S, e Enter | Mover e confirmar nos menus |
+| Clique | Apertar o botão sob o cursor |
+
+As habilidades novas só passam a existir depois da primeira vitória da região que as entrega. Setas e Enter também funcionam no título e nos painéis.
