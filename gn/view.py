@@ -298,10 +298,12 @@ def draw_hub():
             label = "Selado"
         if zone["id"] == "industrial" and save["cleared"].get(zone["id"]):
             label = "Em paz"
-        tint = "#b6ffb0" if save["cleared"].get(zone["id"]) else "#ffe08a"
-        screen_text(zone["name"], x - sim.G.camx + OX, GROUND - 168, 8)
-        screen_text(label, x - sim.G.camx + OX, GROUND - 150, 8, tint)
-    screen_text("Loja", 220 - sim.G.camx + OX, GROUND - 160, 8)
+        tint = "#d8ffc8" if save["cleared"].get(zone["id"]) else "#ffe08a"
+        plate_lines(
+            [(zone["name"], "#fff8ea"), (label, tint)],
+            x - sim.G.camx + OX, GROUND - 186,
+        )
+    plate_lines([("Loja", "#fff8ea")], 220 - sim.G.camx + OX, GROUND - 176)
     player = sim.G.player
     near = ""
     if abs(player["x"] - 220) < 70:
@@ -310,7 +312,65 @@ def draw_hub():
         if abs(player["x"] - PORTAL_X[i]) < 54:
             near = "Selado" if zone["id"] == "industrial" and cleared_count(save) < 5 else "E  Entrar"
     if near:
-        screen_text(near, player["x"] - sim.G.camx + OX, player["y"] - 86, 8)
+        plate_lines([(near, "#fff8ea")], player["x"] - sim.G.camx + OX, player["y"] - 108)
+
+
+def draw_bubble(who, name, text, anchor_x, anchor_y, waiting):
+    face = font(8)
+    lines = wrap(text if text else " ", face, 270)
+    line_h = face.get_height() + 2
+    width = 300
+    height = 36 + line_h * len(lines)
+    left = int(max(16, min(VW - width - 16, anchor_x - width / 2)))
+    top = int(max(16, anchor_y - height - 20))
+    screen = sim.G.screen
+    boss_voice = who == "boss"
+    fill = (46, 24, 28) if boss_voice else (255, 248, 232)
+    edge = (18, 10, 12) if boss_voice else (18, 42, 28)
+    rect = pygame.Rect(left, top, width, height)
+    pygame.draw.rect(screen, fill, rect, border_radius=8)
+    pygame.draw.rect(screen, edge, rect, 4, border_radius=8)
+    tip_x = int(max(left + 22, min(left + width - 22, anchor_x)))
+    tail_y = min(VH - 8, top + height + 14)
+    pygame.draw.polygon(screen, edge, [(tip_x - 10, top + height - 2), (tip_x + 10, top + height - 2), (tip_x, tail_y)])
+    pygame.draw.polygon(screen, fill, [(tip_x - 6, top + height - 2), (tip_x + 6, top + height - 2), (tip_x, tail_y - 4)])
+    name_col = "#ffd8cc" if boss_voice else "#102418"
+    ink = "#fff8ee" if boss_voice else "#142018"
+    bubble_text(name, left + 14, top + 8, 8, name_col)
+    y = top + 30
+    for i, line in enumerate(lines):
+        piece = line
+        if i == len(lines) - 1 and not waiting and int(sim.G.time * 8) % 2 == 0:
+            piece += "_"
+        bubble_text(piece, left + 14, y, 8, ink)
+        y += line_h
+    if waiting and int(sim.G.time * 3) % 2 == 0:
+        bubble_text("E", left + width - 28, top + height - 26, 8, name_col)
+
+
+def draw_scene_talk():
+    boss = sim.G.world.get("boss")
+    if not boss:
+        return
+    player = sim.G.player
+    if boss["state"] == "talk":
+        who, text = TALKS[boss["def"]["id"]][boss["line"]]
+        shown = text[:int(boss["chars"])]
+        waiting = boss["chars"] >= len(text)
+        if who == "boss":
+            name = boss["def"]["bossName"]
+            x = boss["x"] - sim.G.camx + OX
+            y = boss["y"] - min(150, boss["def"]["drawH"] * 0.42) + OY
+        else:
+            name = "Kai"
+            x = player["x"] - sim.G.camx + OX
+            y = player["y"] - 108 + OY
+        draw_bubble(who, name, shown, x, y, waiting)
+    elif boss["state"] == "cheer":
+        draw_bubble(
+            "kai", "Kai", CHEERS[boss["def"]["id"]],
+            player["x"] - sim.G.camx + OX, player["y"] - 130 + OY, True,
+        )
 
 
 def draw_hud():
@@ -318,26 +378,31 @@ def draw_hud():
     save = sim.G.save
     sprites = sim.G.sprites
     blit(sprites["kai"][0], 58, 86, 70, False, True)
-    screen_text("KAI", 100, 18, 10, "#fff6df", "left")
-    screen_text("Nv." + str(1 + cleared_count(save)), 100, 38, 8, "#d5e6cf", "left")
+    plate_lines(
+        [("KAI", "#fff8ea"), ("Nv." + str(1 + cleared_count(save)), "#d8ffc8")],
+        96, 14, size=10, align="left",
+    )
     draw_bar(100, 58, 170, 12, player["hp"] / sim.max_hp(), "#e23d4a", "#3a141c")
-    screen_text(str(math.ceil(player["hp"])) + "/" + str(sim.max_hp()), 278, 56, 8, "#fff6df", "left")
+    plate_lines([(str(math.ceil(player["hp"])) + "/" + str(sim.max_hp()), "#fff8ea")], 276, 52, size=8, align="left")
     blit(sprites["items"][0], 118, 96, 18, False, True)
-    screen_text(str(save["crystals"]), 132, 84, 8, "#9fd8ff", "left")
+    plate_lines([(str(save["crystals"]), "#d7f4ff")], 132, 78, size=8, align="left")
     blit(sprites["items"][2], 210, 96, 20, False, True)
-    screen_text(str(save["potions"]), 224, 84, 8, "#b6ffb0", "left")
+    plate_lines([(str(save["potions"]), "#e4ffd8")], 224, 78, size=8, align="left")
     icons = [("pulo", True), ("double", False), ("dash", False), ("spores", False), ("wall", False), ("shot", False)]
     labels = {"pulo": "pulo", "double": "raiz", "dash": "dash", "spores": "esporo", "wall": "parede", "shot": "tiro"}
     ix = 100
     for ability, always in icons:
         if not always and not sim.has(ability):
             continue
-        screen_text(labels[ability], ix + 16, 108, 7, "#d5e6cf")
+        plate_lines([(labels[ability], "#fff8ea")], ix + 16, 102, size=8)
         ix += 78
     world = sim.G.world
     if world["mode"] == "level" and world.get("tier"):
-        screen_text(world["zone"]["name"], VW - 16, 16, 8, "#fff6df", "right")
-        screen_text(world["tier"]["name"], VW - 16, 36, 8, "#ffe08a", "right")
+        plate_lines(
+            [(world["zone"]["name"], "#fff8ea"), (world["tier"]["name"], "#ffe08a")],
+            VW - 12, 12, align="right",
+        )
+    draw_scene_talk()
 
 
 def render_world():
