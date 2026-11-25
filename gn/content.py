@@ -44,6 +44,15 @@ ABILITIES = {
     "pulse": {"name": "Pulso do Planeta", "desc": "O vale silenciou. O santuário ficou inteiro."},
 }
 
+TALKS = {
+    "floresta": [
+        ("boss", "Essa mata inteira vira tábua. Árvore em pé é desperdício."),
+        ("kai", "Elas não são tábua. Eu vou deixar esta floresta de pé."),
+        ("boss", "Um garoto e um cajado contra a serra?"),
+        ("kai", "Contra a serra. E contra você."),
+    ],
+}
+
 RESTORE = {
     "floresta": "As árvores queimadas e os troncos cortados voltaram a ser uma floresta frondosa.",
     "mares": "A água poluída clareou. O lixo sumiu e os peixes voltaram às marés.",
