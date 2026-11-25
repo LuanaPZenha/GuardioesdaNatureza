@@ -1003,19 +1003,34 @@ def update_hub(dt):
         open_pause()
 
 
+def cutscene(boss):
+    return boss and boss["state"] in ("talk", "cheer")
+
+
 def update_level(dt):
-    update_player(dt)
+    boss = G.world.get("boss")
+    if cutscene(boss):
+        G.player["vx"] = 0
+        G.player["vy"] = 0
+        G.player["dir"] = 1 if boss["x"] >= G.player["x"] else -1
+    else:
+        update_player(dt)
     if G.ui_open:
         return
     arena = G.world.get("arena")
     if arena and not arena["locked"] and arena["lock"] < G.player["x"] < arena["x"] + arena["w"]:
         arena["locked"] = True
         G.world["platforms"].append(G.world["leftWall"])
-        G.world["boss"]["state"] = "intro"
-        G.world["boss"]["t"] = 1.15
-        G.world["banner"] = G.world["zone"]["bossName"]
-        G.world["bannerT"] = 2.2
-        sfx("roar")
+        boss = G.world["boss"]
+        boss["state"] = "talk"
+        boss["line"] = 0
+        boss["chars"] = 0
+        G.world["banner"] = ""
+        G.world["bannerT"] = 0
+        music.play("boss")
+    if cutscene(G.world.get("boss")):
+        update_boss(dt)
+        return
     update_enemies(dt)
     update_boss(dt)
     update_hazards(dt)
@@ -1073,6 +1088,7 @@ def open_pause():
     ]
     if G.mode == "level":
         buttons.append({"label": "Santuário", "fn": start_hub, "enabled": True})
+    buttons.append({"label": "Sair", "fn": quit_game, "enabled": True})
     open_panel("pause", "Pausa", "Guardiões", [], buttons)
 
 
