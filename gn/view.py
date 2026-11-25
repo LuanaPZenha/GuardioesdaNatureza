@@ -4,7 +4,7 @@ import random
 
 import pygame
 
-from gn.content import GROUND, PORTAL_X, VW, VH, ZONES, cleared_count, preview_tier
+from gn.content import CHEERS, GROUND, PORTAL_X, TALKS, VW, VH, ZONES, cleared_count, preview_tier
 from gn import sim
 
 _cache = {}
@@ -48,10 +48,10 @@ def blit(spr, x, y, height, flip=False, screen=False):
     sim.G.screen.blit(img, (sx - img.get_width() // 2, sy - img.get_height()))
 
 
-def screen_text(text, x, y, size, fill="#f6edd4", align="center"):
+def screen_text(text, x, y, size, fill="#f6edd4", align="center", shade=(16, 32, 24)):
     face = font(size)
     img = face.render(str(text), True, color(fill))
-    shadow = face.render(str(text), True, (16, 32, 24))
+    shadow = face.render(str(text), True, shade)
     if align == "left":
         pos = (int(x), int(y))
     elif align == "right":
@@ -60,6 +60,50 @@ def screen_text(text, x, y, size, fill="#f6edd4", align="center"):
         pos = (int(x - img.get_width() / 2), int(y))
     sim.G.screen.blit(shadow, (pos[0] + 2, pos[1] + 2))
     sim.G.screen.blit(img, pos)
+
+
+def plate_lines(lines, x, y, size=9, align="center"):
+    """Texto claro com contorno escuro, sem caixa, para ler em cima do cenário."""
+    face = font(size)
+    rows = []
+    width = 0
+    for text, fill in lines:
+        img = face.render(str(text), True, color(fill))
+        edge = face.render(str(text), True, (18, 32, 22))
+        rows.append((img, edge))
+        width = max(width, img.get_width())
+    line_h = face.get_height() + 1
+    if align == "left":
+        left = int(x)
+    elif align == "right":
+        left = int(x - width)
+    else:
+        left = int(x - width / 2)
+    top = int(y)
+    ring = (
+        (-2, 0), (2, 0), (0, -2), (0, 2),
+        (-1, 0), (1, 0), (0, -1), (0, 1),
+        (-1, -1), (1, -1), (-1, 1), (1, 1),
+    )
+    yy = top
+    screen = sim.G.screen
+    for img, edge in rows:
+        if align == "left":
+            xx = left
+        elif align == "right":
+            xx = left + width - img.get_width()
+        else:
+            xx = left + (width - img.get_width()) // 2
+        for dx, dy in ring:
+            screen.blit(edge, (xx + dx, yy + dy))
+        screen.blit(img, (xx, yy))
+        yy += line_h
+
+
+def bubble_text(text, x, y, size, fill):
+    face = font(size)
+    img = face.render(str(text), False, color(fill))
+    sim.G.screen.blit(img, (int(x), int(y)))
 
 
 def draw_bar(x, y, w, h, ratio, fill, back):
