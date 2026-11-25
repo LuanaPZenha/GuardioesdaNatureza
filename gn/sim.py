@@ -776,7 +776,7 @@ def update_boss(dt):
             boss["pattern"] = patterns[boss["step"] % len(patterns)]
             boss["step"] += 1
             boss["state"] = "tell"
-            boss["t"] = 0.58
+            boss["t"] = 0.78 if boss["phase"] == 1 else 0.64
             boss["aimX"] = player["x"]
             boss["aimY"] = player["y"] - 24
         return
@@ -805,7 +805,7 @@ def update_boss(dt):
                 boss["y"] = arena["floor"]
                 boss["hop"] = False
                 boss["t"] = 0
-                G.world["hazards"].append({"kind": "zone", "x": boss["x"] - 70, "y": arena["floor"] - 40, "w": 140, "h": 40, "dmg": 14, "warn": 0.05, "life": 0.28, "spr": 3, "next": 0})
+                G.world["hazards"].append({"kind": "zone", "x": boss["x"] - 70, "y": arena["floor"] - 40, "w": 140, "h": 40, "dmg": 9, "warn": 0.05, "life": 0.22, "spr": 3, "next": 0, "boss": True})
                 G.shake = 8
         if boss["wind"]:
             player["vx"] += boss["wind"] * 420 * dt
@@ -814,14 +814,14 @@ def update_boss(dt):
         boss["t"] -= dt
         if boss["t"] <= 0:
             boss["state"] = "recover"
-            boss["t"] = 0.42 if boss["phase"] > 1 else 0.58
+            boss["t"] = 0.7 if boss["phase"] > 1 else 0.95
             boss["vx"] = 0
         return
     if boss["state"] == "recover":
         boss["t"] -= dt
         if boss["t"] <= 0:
             boss["state"] = "idle"
-            boss["t"] = 0.32 if boss["phase"] > 1 else 0.5
+            boss["t"] = 0.55 if boss["phase"] > 1 else 0.8
 
 
 def update_hazards(dt):
@@ -838,8 +838,8 @@ def update_hazards(dt):
                 dx = player["x"] - h["x"]
                 dy = (player["y"] - 24) - h["y"]
                 mag = math.hypot(dx, dy) or 1
-                h["vx"] += (dx / mag) * 280 * dt
-                h["vy"] += (dy / mag) * 280 * dt
+                h["vx"] += (dx / mag) * 160 * dt
+                h["vy"] += (dy / mag) * 160 * dt
             h["x"] += h["vx"] * dt
             h["y"] += h["vy"] * dt
             inside = any(
@@ -864,14 +864,22 @@ def update_hazards(dt):
                         burst(h["x"], h["y"], 5, 4)
                         sfx("boom")
             elif player["hurt"] <= 0 and math.hypot(player["x"] - h["x"], (player["y"] - 24) - h["y"]) < player["hw"] + h["r"]:
-                dmg = max(1, round(h["dmg"] * G.world["tier"]["dmg"])) if h.get("boss") else h["dmg"]
+                if h.get("boss") and G.world.get("tier"):
+                    dmg = max(1, round(h["dmg"] * boss_scale(G.world["tier"]["dmg"])))
+                else:
+                    dmg = h["dmg"]
                 hurt_player(dmg, h["x"])
                 h["life"] = 0
         elif h["kind"] == "zone" and h.get("warn", 0) <= 0 and player["hurt"] <= 0:
             h["next"] = h.get("next", 0) - dt
             box = {"x": player["x"] - player["hw"], "y": player["y"] - player["h"], "w": player["hw"] * 2, "h": player["h"]}
             if h["next"] <= 0 and rects(box, h):
-                scaled = h["dmg"] if h.get("permanent") or h["dmg"] > 20 else round(h["dmg"] * (G.world["tier"]["dmg"] if G.world.get("tier") else 1))
+                if h.get("boss") and G.world.get("tier"):
+                    scaled = max(1, round(h["dmg"] * boss_scale(G.world["tier"]["dmg"])))
+                elif h.get("permanent") or h["dmg"] > 20:
+                    scaled = h["dmg"]
+                else:
+                    scaled = round(h["dmg"] * (G.world["tier"]["dmg"] if G.world.get("tier") else 1))
                 hurt_player(scaled, h["x"] + h["w"] / 2)
                 h["next"] = 0.48
                 if not h.get("permanent"):
@@ -934,6 +942,7 @@ def defeat_boss():
     if not boss or boss["rewarded"]:
         return
     boss["rewarded"] = True
+    music.play("calm")
     zone = G.world["zone"]
     zid = zone["id"]
     first = not G.save["cleared"].get(zid)
