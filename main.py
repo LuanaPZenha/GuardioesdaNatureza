@@ -63,6 +63,7 @@ def code_of(key):
         pygame.K_j: "KeyJ", pygame.K_k: "KeyK", pygame.K_q: "KeyQ", pygame.K_e: "KeyE",
         pygame.K_LSHIFT: "ShiftLeft", pygame.K_RSHIFT: "ShiftRight",
         pygame.K_ESCAPE: "Escape",
+        pygame.K_RETURN: "Enter", pygame.K_KP_ENTER: "Enter",
     }
     return table.get(key)
 
@@ -71,6 +72,7 @@ def title_actions():
     actions = [sim.start_hub, sim.open_how, sim.open_credits]
     if sim.G.has_save:
         actions.append(sim.confirm_new)
+    actions.append(sim.quit_game)
     return actions
 
 
