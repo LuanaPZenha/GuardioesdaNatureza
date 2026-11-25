@@ -105,7 +105,7 @@ ZONES = [
     {
         "id": "floresta", "name": "Floresta Esquecida", "tile": 0, "ability": "double",
         "bossName": "Deforestor Gamma", "bossSub": "O Triturador",
-        "bossHp": 420, "bossHw": 78, "bossH": 118, "drawH": 250,
+        "bossHp": 250, "bossHw": 78, "bossH": 118, "drawH": 250,
         "p1": ["saws", "charge", "slam"], "p2": ["saws", "charge", "slam", "saws"], "orbit": True,
         "enemies": [
             {"name": "Espinhento", "ai": "patrol", "hp": 34, "dmg": 8, "speed": 72, "hw": 18, "h": 44},
@@ -116,7 +116,7 @@ ZONES = [
     {
         "id": "mares", "name": "Costa das Marés", "tile": 1, "ability": "dash",
         "bossName": "Polluto", "bossSub": "O Fardo do Oceano",
-        "bossHp": 460, "bossHw": 70, "bossH": 130, "drawH": 270,
+        "bossHp": 280, "bossHw": 70, "bossH": 130, "drawH": 270,
         "p1": ["spit", "slam", "tire"], "p2": ["spit", "suction", "slam"],
         "enemies": [
             {"name": "Borra", "ai": "patrol", "hp": 36, "dmg": 8, "speed": 58, "hw": 20, "h": 42},
@@ -127,7 +127,7 @@ ZONES = [
     {
         "id": "pantano", "name": "Pântano Tóxico", "tile": 2, "ability": "spores",
         "bossName": "Miasma", "bossSub": "A Podridão",
-        "bossHp": 500, "bossHw": 74, "bossH": 140, "drawH": 280,
+        "bossHp": 300, "bossHw": 74, "bossH": 140, "drawH": 280,
         "p1": ["clouds", "hop", "rain"], "p2": ["rain", "hop", "clouds"],
         "enemies": [
             {"name": "Gosma", "ai": "hopper", "hp": 40, "dmg": 9, "speed": 50, "hw": 18, "h": 36},
@@ -138,7 +138,7 @@ ZONES = [
     {
         "id": "montanhas", "name": "Montanhas Eternas", "tile": 3, "ability": "wall",
         "bossName": "Avalanche Prime", "bossSub": "O Inverno de Ferro",
-        "bossHp": 540, "bossHw": 76, "bossH": 140, "drawH": 280,
+        "bossHp": 330, "bossHw": 76, "bossH": 140, "drawH": 280,
         "p1": ["shards", "roll", "wind"], "p2": ["shards", "roll", "icicles"],
         "enemies": [
             {"name": "Morcego-Gelo", "ai": "flyer", "hp": 26, "dmg": 9, "speed": 110, "hw": 20, "h": 32},
@@ -149,7 +149,7 @@ ZONES = [
     {
         "id": "coracao", "name": "Coração do Planeta", "tile": 4, "ability": "shot",
         "bossName": "Corrupto Cristalino", "bossSub": "A Lança Partida",
-        "bossHp": 580, "bossHw": 72, "bossH": 145, "drawH": 290,
+        "bossHp": 350, "bossHw": 72, "bossH": 145, "drawH": 290,
         "p1": ["beam", "ring", "blink"], "p2": ["beam", "ring", "blink", "ring"],
         "enemies": [
             {"name": "Lasca", "ai": "flyer", "hp": 28, "dmg": 10, "speed": 95, "hw": 18, "h": 36},
@@ -160,7 +160,7 @@ ZONES = [
     {
         "id": "industrial", "name": "Vale Industrial", "tile": 5, "ability": "pulse",
         "bossName": "Fornalha-Mãe", "bossSub": "Coração da Fábrica",
-        "bossHp": 760, "bossHw": 90, "bossH": 130, "drawH": 270,
+        "bossHp": 460, "bossHw": 90, "bossH": 130, "drawH": 270,
         "p1": ["missile", "laser", "pound"], "p2": ["missile", "pound", "summon", "laser"],
         "p3": ["missile", "laser", "pound", "summon"],
         "enemies": [
